@@ -14,6 +14,78 @@ Built with [FastMCP](https://gofastmcp.com/) for clean, Pythonic MCP development
 - **Users**: List users and manage their attributes
 - **Attributes**: Access custom field definitions for users and companies
 
+## Quick Start
+
+### Prerequisites
+
+- Python 3.10 or higher
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+- A Harvestr.io account with API access
+
+### 1. Clone and Install
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/harvestr-mcp.git
+cd harvestr-mcp
+
+# Install with uv (recommended)
+uv pip install -e .
+
+# Or with pip
+pip install -e .
+```
+
+### 2. Get Your Harvestr API Token
+
+1. Log in to your [Harvestr.io](https://harvestr.io/) account
+2. Navigate to **Settings** > **Integrations** > **API Access Token**
+3. Click **Create new token** and copy the generated token
+
+### 3. Configure the API Token
+
+Set your API token as an environment variable:
+
+```bash
+# Linux/macOS
+export HARVESTR_API_TOKEN="your-api-token-here"
+
+# Windows (PowerShell)
+$env:HARVESTR_API_TOKEN="your-api-token-here"
+
+# Windows (CMD)
+set HARVESTR_API_TOKEN=your-api-token-here
+```
+
+For persistent configuration, add the export to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.):
+
+```bash
+echo 'export HARVESTR_API_TOKEN="your-api-token-here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+> **Security Note**: Treat your API token like a password. Never commit it to version control or share it publicly.
+
+### 4. Run the Server
+
+```bash
+# Using FastMCP CLI (recommended)
+fastmcp run src/harvestr_mcp/server.py:mcp
+
+# Or using Python directly
+python -m harvestr_mcp.server
+```
+
+### 5. Test with MCP Inspector (Optional)
+
+To interactively test the server's tools:
+
+```bash
+npx @modelcontextprotocol/inspector fastmcp run src/harvestr_mcp/server.py:mcp
+```
+
+This opens a web interface where you can explore and test all available tools.
+
 ## Installation
 
 ### Using uv (recommended)
@@ -27,22 +99,6 @@ uv pip install -e .
 ```bash
 pip install -e .
 ```
-
-## Configuration
-
-### API Token
-
-Create a Harvestr API token:
-
-1. Go to Harvestr Settings > Integrations > API Access Token
-2. Create a new token
-3. Set the `HARVESTR_API_TOKEN` environment variable:
-
-```bash
-export HARVESTR_API_TOKEN="your-api-token-here"
-```
-
-> **Security Note**: Treat your API token like a password. Never commit it to version control or share it publicly.
 
 ## Usage
 
@@ -173,17 +229,55 @@ asyncio.run(main())
 
 ## Development
 
-### Running Tests
+### Setting Up for Development
 
 ```bash
-# Install dev dependencies
+# Clone and enter the repository
+git clone https://github.com/your-org/harvestr-mcp.git
+cd harvestr-mcp
+
+# Install with dev dependencies using uv (recommended)
 uv pip install -e ".[dev]"
 
-# Run tests
+# Or with pip
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+The test suite uses pytest with pytest-asyncio for async test support:
+
+```bash
+# Run all tests
 pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_client.py
+
+# Run specific test class
+pytest tests/test_server.py::TestUserTools
+
+# Run with coverage (if installed)
+pytest --cov=harvestr_mcp
+```
+
+### Test Structure
+
+```
+tests/
+├── __init__.py
+├── conftest.py      # Shared fixtures and test configuration
+├── test_client.py   # Tests for the Harvestr API client
+├── test_types.py    # Tests for Pydantic models
+└── test_server.py   # Tests for MCP server tools
 ```
 
 ### Testing with MCP Inspector
+
+For interactive testing of the server:
 
 ```bash
 npx @modelcontextprotocol/inspector fastmcp run src/harvestr_mcp/server.py:mcp
@@ -191,8 +285,16 @@ npx @modelcontextprotocol/inspector fastmcp run src/harvestr_mcp/server.py:mcp
 
 ### Code Formatting
 
+This project uses [Ruff](https://docs.astral.sh/ruff/) for linting and formatting:
+
 ```bash
+# Check for issues
+ruff check .
+
+# Auto-fix issues
 ruff check --fix .
+
+# Format code
 ruff format .
 ```
 
