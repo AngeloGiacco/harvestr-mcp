@@ -1,163 +1,194 @@
-"""Type definitions for Harvestr API entities."""
+"""Pydantic models for Harvestr API entities."""
 
-from typing import Literal, TypedDict
+from datetime import datetime
+from typing import Literal
+
+from pydantic import BaseModel, Field
 
 
-class Segment(TypedDict):
+class Segment(BaseModel):
     """A company segment."""
 
     id: str
-    clientId: str
+    client_id: str = Field(alias="clientId")
     name: str
-    createdAt: str
-    updatedAt: str
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+
+    model_config = {"populate_by_name": True}
 
 
-class Company(TypedDict, total=False):
+class Company(BaseModel):
     """A Harvestr company."""
 
     id: str
-    clientId: str
+    client_id: str = Field(alias="clientId")
     name: str
-    createdAt: str
-    updatedAt: str
-    importId: str  # Only if created from XLSX import
-    externalUid: str  # Only if external UID configured
-    segments: list[Segment]
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+    import_id: str | None = Field(default=None, alias="importId")
+    external_uid: str | None = Field(default=None, alias="externalUid")
+    segments: list[Segment] = Field(default_factory=list)
+
+    model_config = {"populate_by_name": True}
 
 
-class CompanyCreate(TypedDict, total=False):
+class CompanyCreate(BaseModel):
     """Payload for creating a company."""
 
     name: str
-    externalUid: str
-    segmentIds: list[str]
+    external_uid: str | None = Field(default=None, alias="externalUid")
+    segment_ids: list[str] | None = Field(default=None, alias="segmentIds")
+
+    model_config = {"populate_by_name": True}
 
 
-class CompanyUpdate(TypedDict, total=False):
+class CompanyUpdate(BaseModel):
     """Payload for updating a company."""
 
-    name: str
-    externalUid: str
-    segmentIds: list[str]
+    name: str | None = None
+    external_uid: str | None = Field(default=None, alias="externalUid")
+    segment_ids: list[str] | None = Field(default=None, alias="segmentIds")
+
+    model_config = {"populate_by_name": True}
 
 
-class Component(TypedDict, total=False):
+class Component(BaseModel):
     """A Harvestr component."""
 
     id: str
-    clientId: str
-    createdAt: str
-    updatedAt: str
+    client_id: str = Field(alias="clientId")
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
     title: str
-    description: str
-    parentId: str
+    description: str | None = None
+    parent_id: str | None = Field(default=None, alias="parentId")
+
+    model_config = {"populate_by_name": True}
 
 
-class DiscoveryField(TypedDict):
+class DiscoveryField(BaseModel):
     """A discovery field definition."""
 
     id: str
-    clientId: str
+    client_id: str = Field(alias="clientId")
     name: str
 
+    model_config = {"populate_by_name": True}
 
-class DiscoveryFieldValue(TypedDict):
+
+class DiscoveryFieldValue(BaseModel):
     """A discovery field value."""
 
     field: DiscoveryField
     value: str
 
 
-class Discovery(TypedDict, total=False):
+class Discovery(BaseModel):
     """A Harvestr discovery."""
 
     id: str
-    clientId: str
-    createdAt: str
-    updatedAt: str
+    client_id: str = Field(alias="clientId")
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
     title: str
-    description: str
-    discoveryStateId: str
-    parentId: str
-    parentType: Literal["COMPONENT", "DISCOVERY", "NONE"]
-    assigneeId: str
-    tags: list[str]
-    lastDiscoverystateUpdatedAt: str
-    lastFeedback: str
-    fieldsValues: list[DiscoveryFieldValue]
+    description: str | None = None
+    discovery_state_id: str = Field(alias="discoveryStateId")
+    parent_id: str = Field(alias="parentId")
+    parent_type: Literal["COMPONENT", "DISCOVERY", "NONE"] = Field(alias="parentType")
+    assignee_id: str | None = Field(default=None, alias="assigneeId")
+    tags: list[str] = Field(default_factory=list)
+    last_discoverystate_updated_at: datetime = Field(alias="lastDiscoverystateUpdatedAt")
+    last_feedback: str = Field(alias="lastFeedback")
+    fields_values: list[DiscoveryFieldValue] | None = Field(default=None, alias="fieldsValues")
+
+    model_config = {"populate_by_name": True}
 
 
-class DiscoveryState(TypedDict):
+class DiscoveryState(BaseModel):
     """A discovery state."""
 
     id: str
-    clientId: str
+    client_id: str = Field(alias="clientId")
     name: str
-    createdAt: str
-    updatedAt: str
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+
+    model_config = {"populate_by_name": True}
 
 
-class Selection(TypedDict):
+class Selection(BaseModel):
     """A feedback selection."""
 
     id: str
-    clientId: str
-    createdAt: str
-    updatedAt: str
+    client_id: str = Field(alias="clientId")
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
     content: str
-    fullSelection: bool
+    full_selection: bool = Field(alias="fullSelection")
+
+    model_config = {"populate_by_name": True}
 
 
-class Feedback(TypedDict, total=False):
+class Feedback(BaseModel):
     """A Harvestr feedback item."""
 
     id: str
-    clientId: str
-    createdAt: str
-    updatedAt: str
-    starred: bool
-    score: int
-    messageId: str
-    discoveryId: str
-    selections: list[Selection]
+    client_id: str = Field(alias="clientId")
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+    starred: bool = False
+    score: int = 0
+    message_id: str = Field(alias="messageId")
+    discovery_id: str = Field(alias="discoveryId")
+    selections: list[Selection] = Field(default_factory=list)
+
+    model_config = {"populate_by_name": True}
 
 
-class Message(TypedDict, total=False):
+class Message(BaseModel):
     """A Harvestr message."""
 
     id: str
-    clientId: str
-    createdAt: str
-    updatedAt: str
-    content: str
-    authorId: str
+    client_id: str = Field(alias="clientId")
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+    content: str | None = None
+    author_id: str | None = Field(default=None, alias="authorId")
+
+    model_config = {"populate_by_name": True}
 
 
-class User(TypedDict, total=False):
+class User(BaseModel):
     """A Harvestr user."""
 
     id: str
-    clientId: str
-    email: str
-    name: str
-    createdAt: str
-    updatedAt: str
+    client_id: str = Field(alias="clientId")
+    email: str | None = None
+    name: str | None = None
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+
+    model_config = {"populate_by_name": True}
 
 
-class Attribute(TypedDict):
+class Attribute(BaseModel):
     """An attribute definition."""
 
     id: str
-    clientId: str
+    client_id: str = Field(alias="clientId")
     name: str
     type: str
-    createdAt: str
-    updatedAt: str
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
+
+    model_config = {"populate_by_name": True}
 
 
-class AttributeValue(TypedDict):
+class AttributeValue(BaseModel):
     """An attribute value."""
 
-    attributeId: str
+    attribute_id: str = Field(alias="attributeId")
     value: str
+
+    model_config = {"populate_by_name": True}
